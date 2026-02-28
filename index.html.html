@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
+<title>우리 가족 여행</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧳</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Bagel+Fat+One&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    min-height: 100vh;
+    background: linear-gradient(160deg, #FFF8F0 0%, #FFF0E6 30%, #F0F4FF 70%, #E8F4F0 100%);
+    font-family: 'Noto Sans KR', system-ui, -apple-system, sans-serif;
+    color: #333;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .fun-title {
+    font-family: 'Bagel Fat One', cursive;
+    background: linear-gradient(135deg, #FF6B6B, #4ECDC4, #FFE66D);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .card {
+    background: rgba(255,255,255,0.85); backdrop-filter: blur(20px);
+    border-radius: 24px; border: 1px solid rgba(255,255,255,0.6);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #FF6B6B, #ee5a24); color: white;
+    border: none; border-radius: 16px; padding: 14px 28px;
+    font-size: 15px; font-weight: 600; cursor: pointer;
+    transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(238,90,36,0.3);
+    font-family: inherit;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(238,90,36,0.4); }
+  .btn-primary:active { transform: scale(0.97); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .btn-primary.green { background: linear-gradient(135deg, #4ECDC4, #44B09E); box-shadow: 0 4px 16px rgba(68,176,158,0.3); }
+  .btn-secondary {
+    background: rgba(255,255,255,0.8); color: #333; border: 2px solid #eee;
+    border-radius: 16px; padding: 12px 24px; font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s ease; font-family: inherit;
+  }
+  .btn-secondary:hover { background: #f8f8f8; }
+  .btn-ghost { background: none; border: none; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+  .tab-active { background: linear-gradient(135deg, #FF6B6B, #ee5a24) !important; color: white !important; box-shadow: 0 4px 12px rgba(238,90,36,0.3); }
+  .float-blob { position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.15; animation: floatBlob 20s ease-in-out infinite; pointer-events: none; z-index: 0; }
+  @keyframes floatBlob { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(30px,-20px) scale(1.1)} 66%{transform:translate(-20px,20px) scale(0.9)} }
+  @keyframes slideUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+  .animate-in { animation: slideUp 0.5s cubic-bezier(0.4,0,0.2,1) forwards; }
+  .progress-bar { height: 8px; border-radius: 4px; background: #eee; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #4ECDC4, #44B09E); transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+  .modal-overlay {
+    position: fixed; top:0;left:0;right:0;bottom:0;
+    background: rgba(0,0,0,0.3); backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100; animation: fadeIn 0.2s ease;
+  }
+  .modal-content {
+    background: white; border-radius: 28px; padding: 28px;
+    max-width: 440px; width: 92%; box-shadow: 0 24px 80px rgba(0,0,0,0.15);
+    animation: slideUp 0.3s ease; max-height: 90vh; overflow-y: auto;
+  }
+  input, select, textarea {
+    width: 100%; padding: 12px 16px; border: 2px solid #eee;
+    border-radius: 14px; font-size: 14px; font-family: inherit; outline: none;
+    transition: border-color 0.2s; background: white; color: #333;
+  }
+  input:focus, select:focus, textarea:focus { border-color: #4ECDC4; }
+  .member-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s; border: 2px solid transparent;
+  }
+  .type-selector { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .type-btn {
+    padding: 10px 4px; border-radius: 14px; border: 2px solid #eee;
+    background: white; cursor: pointer; text-align: center;
+    transition: all 0.2s; font-size: 13px; font-family: inherit;
+  }
+  .type-btn.active { border-color: #4ECDC4; background: #E8FAF8; }
+  .room-code-display {
+    font-family: 'Courier New', monospace; font-size: 32px; font-weight: 900;
+    letter-spacing: 6px; background: linear-gradient(135deg, #FF6B6B, #ee5a24);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .room-code-input { text-align: center; font-family: 'Courier New', monospace; font-size: 24px; font-weight: 700; letter-spacing: 8px; text-transform: uppercase; }
+  .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ECDC4; display: inline-block; animation: pulse 2s ease infinite; }
+  .container { max-width: 520px; margin: 0 auto; padding: 20px 16px; position: relative; z-index: 1; padding-bottom: 40px; }
+  .hidden { display: none !important; }
+  .flex-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .photo-item { position: relative; border-radius: 14px; overflow: hidden; aspect-ratio: 1; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  .photo-item img { width: 100%; height: 100%; object-fit: cover; }
+  .photo-caption { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.6)); padding: 16px 8px 6px; color: white; font-size: 11px; font-weight: 500; }
+  .dday-badge { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; }
+  .check-row { display: flex; align-items: center; gap: 10px; padding: 10px 8px; border-radius: 12px; margin-bottom: 2px; }
+  .check-box { width: 24px; height: 24px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all 0.2s; }
+  .schedule-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+  .upload-area { display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed #ddd; border-radius: 16px; padding: 28px 20px; cursor: pointer; margin-bottom: 16px; background: rgba(78,205,196,0.03); transition: all 0.2s; }
+  .upload-area:hover { border-color: #4ECDC4; background: rgba(78,205,196,0.08); }
+  .tab-btn { padding: 10px 16px; border-radius: 14px; border: none; background: rgba(255,255,255,0.7); color: #666; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; font-family: inherit; transition: all 0.2s; }
+</style>
+</head>
+<body>
+
+<div class="float-blob" style="width:300px;height:300px;background:#FF6B6B;top:-80px;right:-60px"></div>
+<div class="float-blob" style="width:250px;height:250px;background:#4ECDC4;bottom:-50px;left:-40px;animation-delay:-7s"></div>
+<div class="float-blob" style="width:200px;height:200px;background:#FFE66D;top:40%;right:10%;animation-delay:-14s"></div>
+
+<div class="container" id="app"></div>
+
+<script>
+// ═══════════════════════════════════════════
+// 가족 여행 관리 앱 - Vanilla JS
+// ═══════════════════════════════════════════
+
+const ICONS = { plane:"✈️", car:"🚗", train:"🚂", beach:"🏖️", mountain:"⛰️", city:"🏙️", camping:"🏕️", theme:"🎢" };
+const COLORS = ["#FF6B6B","#4ECDC4","#FFE66D","#A8E6CF","#DDA0DD","#87CEEB","#F4A460","#98D8C8"];
+const EMOJIS = ["👨","👩","👧","👦","👴","👵","🧑","👶","🐶","🐱"];
+const TEMPLATES = {
+  beach:["수영복","선크림","비치타올","선글라스","모자","슬리퍼"],
+  mountain:["등산화","등산복","물통","간식","지도","우비"],
+  city:["카메라","충전기","편한 신발","가이드북","우산"],
+  camping:["텐트","침낭","랜턴","버너","식기","장작"],
+  general:["여권/신분증","상비약","충전기","세면도구","여벌옷","간식"]
+};
+
+// ─── State ───
+let state = {
+  screen: "lobby", // lobby | app
+  roomCode: null,
+  nickname: "",
+  trips: [],
+  members: [],
+  view: "home", // home | detail
+  selectedTrip: null,
+  activeTab: "schedule",
+};
+
+// ─── Helpers ───
+const $ = s => document.querySelector(s);
+const genId = () => Date.now().toString(36) + Math.random().toString(36).substr(2,5);
+const genCode = () => { const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let r=""; for(let i=0;i<6;i++) r+=c[Math.floor(Math.random()*c.length)]; return r; };
+const fmtDate = d => { if(!d) return ""; const dt=new Date(d); return `${dt.getMonth()+1}/${dt.getDate()}`; };
+const daysUntil = d => { if(!d) return null; const now=new Date(); now.setHours(0,0,0,0); return Math.ceil((new Date(d)-now)/86400000); };
+
+// ─── Storage ───
+function save() {
+  if (!state.roomCode) return;
+  const key = `familytrip_${state.roomCode}`;
+  const data = { trips: state.trips, members: state.members };
+  try { localStorage.setItem(key, JSON.stringify(data)); } catch(e) { console.warn("Storage full"); }
+}
+
+function load(code) {
+  const key = `familytrip_${code}`;
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+
+// ─── Render ───
+function render() {
+  const app = document.getElementById("app");
+  if (state.screen === "lobby") {
+    app.innerHTML = renderLobby();
+    bindLobby();
+  } else {
+    if (state.view === "home") {
+      app.innerHTML = renderHome();
+      bindHome();
+    } else {
+      app.innerHTML = renderDetail();
+      bindDetail();
+    }
+  }
+}
+
+// ═══════════ LOBBY ═══════════
+function renderLobby() {
+  return `
+    <div class="animate-in">
+      <div style="text-align:center;padding-top:48px;margin-bottom:36px">
+        <div style="font-size:56px;margin-bottom:8px">🧳</div>
+        <h1 class="fun-title" style="font-size:32px;margin-bottom:8px">우리 가족 여행</h1>
+        <p style="color:#888;font-size:15px;line-height:1.6">가족끼리 여행을 함께 계획하고<br>추억을 공유해요</p>
+      </div>
+
+      <div class="card" style="padding:24px;margin-bottom:16px">
+        <label style="font-size:13px;font-weight:600;color:#555;margin-bottom:8px;display:block">내 이름 (닉네임)</label>
+        <input id="nickname" placeholder="예: 아빠, 엄마, 민수..." style="font-size:16px">
+      </div>
+
+      <div class="card" style="padding:24px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:28px">🏠</span>
+          <div><h3 style="font-size:16px;font-weight:700">새 가족 공간 만들기</h3><p style="font-size:13px;color:#888">가족 코드가 자동 생성돼요</p></div>
+        </div>
+        <button class="btn-primary" id="btnCreate" style="width:100%;font-size:16px;padding:16px">✨ 가족 공간 만들기</button>
+      </div>
+
+      <div class="card" style="padding:24px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:28px">🔗</span>
+          <div><h3 style="font-size:16px;font-weight:700">가족 코드로 참여하기</h3><p style="font-size:13px;color:#888">가족에게 받은 코드를 입력하세요</p></div>
+        </div>
+        <input id="joinCode" class="room-code-input" placeholder="코드 입력" maxlength="6" style="margin-bottom:10px">
+        <p id="joinError" style="color:#FF6B6B;font-size:13px;margin-bottom:8px;text-align:center;display:none"></p>
+        <button class="btn-primary green" id="btnJoin" style="width:100%;font-size:16px;padding:16px">🤝 참여하기</button>
+      </div>
+
+      <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;line-height:1.6">
+        같은 가족 코드 → 모든 데이터 공유 (일정·사진·예산·메모)<br>
+        다른 가족 코드 → 완전히 분리된 별도 공간 ✨
+      </p>
+    </div>`;
+}
+
+function bindLobby() {
+  const nickEl = $("#nickname");
+  const codeEl = $("#joinCode");
+  codeEl.addEventListener("input", () => { codeEl.value = codeEl.value.toUpperCase(); });
+
+  $("#btnCreate").onclick = () => {
+    const name = nickEl.value.trim();
+    if (!name) { nickEl.focus(); return; }
+    const code = genCode();
+    state.roomCode = code;
+    state.nickname = name;
+    state.members = [{ id: genId(), name, emoji: "😊", color: COLORS[0] }];
+    state.trips = [];
+    state.screen = "app";
+    state.view = "home";
+    save();
+    render();
+  };
+
+  $("#btnJoin").onclick = () => {
+    const name = nickEl.value.trim();
+    const code = codeEl.value.trim().toUpperCase();
+    if (!name) { nickEl.focus(); return; }
+    if (!code || code.length < 4) { codeEl.focus(); return; }
+
+    const data = load(code);
+    if (!data) {
+      const errEl = $("#joinError");
+      errEl.textContent = "존재하지 않는 가족 코드예요. 같은 기기에서 먼저 만들어야 해요.";
+      errEl.style.display = "block";
+      return;
+    }
+    const already = data.members.some(m => m.name === name);
+    if (!already) {
+      data.members.push({ id: genId(), name, emoji: "😊", color: COLORS[data.members.length % COLORS.length] });
+    }
+    state.roomCode = code;
+    state.nickname = name;
+    state.members = data.members;
+    state.trips = data.trips;
+    state.screen = "app";
+    state.view = "home";
+    save();
+    render();
+  };
+}
+
+// ═══════════ HOME ═══════════
+function renderHome() {
+  const sorted = [...state.trips].sort((a,b) => new Date(a.startDate) - new Date(b.startDate));
+  const tripCards = sorted.length === 0
+    ? `<div style="text-align:center;padding:60px 20px">
+        <div style="font-size:64px;margin-bottom:16px">🌍</div>
+        <p style="font-size:18px;font-weight:600;color:#555;margin-bottom:8px">아직 여행 계획이 없어요</p>
+        <p style="color:#999;font-size:14px">첫 번째 가족 여행을 계획해 볼까요?</p>
+      </div>`
+    : sorted.map(t => {
+        const days = daysUntil(t.startDate);
+        const checked = t.checklist.filter(c=>c.checked).length;
+        const total = t.checklist.length;
+        const pct = total > 0 ? (checked/total)*100 : 0;
+        const ddayHtml = days !== null
+          ? `<div class="dday-badge" style="background:${days<=0?"#E8F8F5":days<=7?"#FFF3E0":"#F0F4FF"};color:${days<=0?"#2ECC71":days<=7?"#E67E22":"#5B7FFF"}">${days<=0?"여행 중! 🎉":`D-${days}`}</div>`
+          : '';
+        return `<div class="card" style="padding:20px;cursor:pointer" data-trip="${t.id}">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+            <div style="display:flex;gap:12px;align-items:center">
+              <div style="font-size:32px">${ICONS[t.type]||"🌍"}</div>
+              <div><h3 style="font-size:17px;font-weight:700;margin-bottom:2px">${t.title}</h3>
+                <p style="font-size:13px;color:#888">${t.destination} ${t.startDate?`• ${fmtDate(t.startDate)}~${fmtDate(t.endDate)}`:""}</p></div>
+            </div>
+            ${ddayHtml}
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="progress-bar" style="flex:1"><div class="progress-fill" style="width:${pct}%"></div></div>
+            <span style="font-size:12px;color:#999;white-space:nowrap">${checked}/${total} 준비완료</span>
+          </div>
+        </div>`;
+      }).join('');
+
+  const memberHtml = state.members.map(m =>
+    `<div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,${m.color}33,${m.color}22);border:2px solid ${m.color};display:flex;align-items:center;justify-content:center;font-size:22px">${m.emoji}</div>
+      <span style="font-size:12px;font-weight:500;color:#555">${m.name}</span>
+    </div>`
+  ).join('');
+
+  return `<div class="animate-in">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-top:8px">
+      <button class="btn-ghost" id="btnRoomInfo" style="display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:14px;background:rgba(255,255,255,0.7)">
+        <span class="sync-dot"></span>
+        <span style="font-size:13px;font-weight:600;color:#555">가족코드: ${state.roomCode}</span>
+      </button>
+      <button class="btn-ghost" id="btnLeave" style="font-size:13px;color:#bbb;padding:8px 12px">나가기</button>
+    </div>
+    <div style="text-align:center;margin-bottom:24px;padding-top:8px">
+      <div style="font-size:40px;margin-bottom:4px">🧳</div>
+      <h1 class="fun-title" style="font-size:28px;margin-bottom:6px">우리 가족 여행</h1>
+      <p style="color:#999;font-size:14px">함께 떠나는 즐거운 여행을 계획해요</p>
+    </div>
+    <div class="card" style="padding:20px 24px;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <span style="font-weight:700;font-size:15px">👨‍👩‍👧‍👦 가족 구성원</span>
+        <button class="btn-ghost" id="btnAddMember" style="color:#4ECDC4;font-size:22px;font-weight:700">+</button>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">${memberHtml}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">${tripCards}</div>
+    <div style="text-align:center;margin-top:24px;padding-bottom:20px">
+      <button class="btn-primary" id="btnAddTrip" style="font-size:16px;padding:16px 40px">✨ 새 여행 추가</button>
+    </div>
+  </div>`;
+}
+
+function bindHome() {
+  document.querySelectorAll("[data-trip]").forEach(el => {
+    el.onclick = () => { state.selectedTrip = el.dataset.trip; state.view = "detail"; state.activeTab = "schedule"; render(); };
+  });
+  $("#btnAddTrip").onclick = showAddTripModal;
+  $("#btnAddMember").onclick = showAddMemberModal;
+  $("#btnLeave").onclick = () => { state.screen = "lobby"; state.roomCode = null; state.nickname = ""; render(); };
+  $("#btnRoomInfo").onclick = showRoomInfoModal;
+}
+
+// ═══════════ DETAIL ═══════════
+function renderDetail() {
+  const t = state.trips.find(x => x.id === state.selectedTrip);
+  if (!t) { state.view = "home"; render(); return ""; }
+
+  const days = daysUntil(t.startDate);
+  const ddayHtml = t.startDate && days > 0
+    ? `<div class="dday-badge" style="background:#FFF3E0;color:#E67E22;margin-top:10px">D-${days} 🗓️</div>` : '';
+
+  const tabs = [
+    { key:"schedule", label:"📋 일정" },
+    { key:"checklist", label:"✅ 체크리스트" },
+    { key:"photos", label:"📸 사진" },
+    { key:"budget", label:"💰 예산" },
+    { key:"notes", label:"📝 메모" },
+  ].map(tab => `<button class="tab-btn ${state.activeTab===tab.key?"tab-active":""}" data-tab="${tab.key}">${tab.label}</button>`).join('');
+
+  let content = "";
+  if (state.activeTab === "schedule") content = renderScheduleTab(t);
+  else if (state.activeTab === "checklist") content = renderChecklistTab(t);
+  else if (state.activeTab === "photos") content = renderPhotosTab(t);
+  else if (state.activeTab === "budget") content = renderBudgetTab(t);
+  else if (state.activeTab === "notes") content = renderNotesTab(t);
+
+  return `<div class="animate-in">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+      <button class="btn-ghost" id="btnBack" style="padding:10px 18px;border-radius:14px;background:rgba(255,255,255,0.7);font-size:14px">← 뒤로</button>
+      <div style="flex:1"></div>
+      <button class="btn-ghost" id="btnDeleteTrip" style="font-size:14px;color:#ccc">🗑️</button>
+    </div>
+    <div class="card" style="padding:24px;margin-bottom:16px;text-align:center">
+      <div style="font-size:48px;margin-bottom:8px">${ICONS[t.type]||"🌍"}</div>
+      <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">${t.title}</h2>
+      <p style="color:#888;font-size:14px">${t.destination} ${ICONS[t.transport]||""} ${t.startDate?`${fmtDate(t.startDate)} ~ ${fmtDate(t.endDate)}`:""}</p>
+      ${ddayHtml}
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:2px">${tabs}</div>
+    ${content}
+  </div>`;
+}
+
+function renderScheduleTab(t) {
+  const rows = t.schedule.length === 0
+    ? `<p style="color:#bbb;text-align:center;padding:20px 0;font-size:14px">일정을 추가해 주세요</p>`
+    : t.schedule.map(s => {
+        const a = state.members.find(m=>m.id===s.assignee);
+        return `<div class="schedule-row">
+          <div style="width:60px;font-size:13px;font-weight:600;color:#5B7FFF">${s.time||"—"}</div>
+          <div style="flex:1;font-size:14px">${s.activity}</div>
+          ${a?`<span class="member-chip" style="background:${a.color}22;color:${a.color}">${a.emoji} ${a.name}</span>`:''}
+        </div>`;
+      }).join('');
+
+  const memberOpts = state.members.map(m => `<option value="${m.id}">${m.emoji} ${m.name}</option>`).join('');
+
+  return `<div class="card" style="padding:20px">
+    <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">📋 여행 일정</h3>
+    ${rows}
+    <div class="flex-row" style="margin-top:16px">
+      <input id="schedTime" placeholder="시간" style="width:80px;flex:none">
+      <input id="schedAct" placeholder="활동 내용" style="flex:1;min-width:120px">
+      <select id="schedWho" style="width:90px;flex:none"><option value="">담당자</option>${memberOpts}</select>
+      <button class="btn-primary" id="btnAddSched" style="padding:10px 16px;font-size:13px">추가</button>
+    </div>
+  </div>`;
+}
+
+function renderChecklistTab(t) {
+  const checked = t.checklist.filter(c=>c.checked).length;
+  const total = t.checklist.length;
+  const pct = total > 0 ? (checked/total)*100 : 0;
+
+  const items = t.checklist.map(item => {
+    const memberBtns = state.members.map(m =>
+      `<span class="member-chip" data-check="${item.id}" data-member="${m.id}" style="background:${item.assignee===m.id?m.color+'33':'transparent'};border:${item.assignee===m.id?`2px solid ${m.color}`:'2px solid transparent'};padding:2px 6px;font-size:14px">${m.emoji}</span>`
+    ).join('');
+    return `<div class="check-row">
+      <div class="check-box" data-toggle="${item.id}" style="border:${item.checked?'none':'2px solid #ddd'};background:${item.checked?'linear-gradient(135deg,#4ECDC4,#44B09E)':'white'}">
+        ${item.checked?'<span style="color:white;font-size:14px">✓</span>':''}
+      </div>
+      <span style="flex:1;font-size:14px;text-decoration:${item.checked?'line-through':'none'};color:${item.checked?'#bbb':'#333'}">${item.text}</span>
+      <div style="display:flex;gap:2px">${memberBtns}</div>
+    </div>`;
+  }).join('');
+
+  return `<div class="card" style="padding:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h3 style="font-size:16px;font-weight:700">✅ 준비물 체크리스트</h3>
+      <span style="font-size:13px;color:#4ECDC4;font-weight:600">${checked}/${total}</span>
+    </div>
+    <div class="progress-bar" style="margin-bottom:16px"><div class="progress-fill" style="width:${pct}%"></div></div>
+    ${items}
+    <div style="margin-top:12px">
+      <input id="newCheckItem" placeholder="준비물 추가... (Enter로 추가)">
+    </div>
+  </div>`;
+}
+
+function renderPhotosTab(t) {
+  const grid = t.photos.length > 0
+    ? `<div class="photo-grid">${t.photos.map(p =>
+        `<div class="photo-item" data-photo="${p.id}">
+          <img src="${p.src}" alt="">
+          ${p.caption?`<div class="photo-caption">${p.caption}</div>`:''}
+        </div>`
+      ).join('')}</div>`
+    : `<p style="color:#bbb;text-align:center;font-size:14px">여행의 추억을 사진으로 남겨보세요</p>`;
+
+  return `<div class="card" style="padding:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h3 style="font-size:16px;font-weight:700">📸 여행 사진</h3>
+      <span style="font-size:13px;color:#888">${t.photos.length}장</span>
+    </div>
+    <label class="upload-area">
+      <div style="font-size:36px;margin-bottom:8px">📷</div>
+      <p style="font-size:14px;font-weight:600;color:#555;margin-bottom:4px">사진 추가하기</p>
+      <p style="font-size:12px;color:#aaa">여러 장 동시 선택 가능</p>
+      <input type="file" id="photoInput" accept="image/*" multiple style="display:none">
+    </label>
+    ${grid}
+    <p style="font-size:11px;color:#ccc;text-align:center;margin-top:12px">💡 사진은 이 기기의 브라우저에 저장돼요</p>
+  </div>`;
+}
+
+function renderBudgetTab(t) {
+  const total = t.budget.reduce((s,b) => s + b.amount, 0);
+  const totalHtml = total > 0
+    ? `<div style="background:linear-gradient(135deg,#667eea22,#764ba222);border-radius:16px;padding:20px;text-align:center;margin-bottom:16px">
+        <p style="font-size:12px;color:#888;margin-bottom:4px">총 지출</p>
+        <p style="font-size:28px;font-weight:800;color:#5B7FFF">${total.toLocaleString()}원</p>
+      </div>` : '';
+
+  const rows = t.budget.length === 0
+    ? `<p style="color:#bbb;text-align:center;padding:20px 0;font-size:14px">지출 내역을 추가해 주세요</p>`
+    : t.budget.map(b => {
+        const payer = state.members.find(m=>m.id===b.paidBy);
+        return `<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f0f0f0">
+          <div style="flex:1"><p style="font-size:14px;font-weight:500">${b.label}</p>${payer?`<p style="font-size:12px;color:#999">${payer.emoji} ${payer.name}</p>`:''}</div>
+          <span style="font-size:15px;font-weight:700">${b.amount.toLocaleString()}원</span>
+        </div>`;
+      }).join('');
+
+  const memberOpts = state.members.map(m => `<option value="${m.id}">${m.emoji} ${m.name}</option>`).join('');
+
+  return `<div class="card" style="padding:20px">
+    <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">💰 여행 예산</h3>
+    ${totalHtml}${rows}
+    <div class="flex-row" style="margin-top:16px">
+      <input id="budgetLabel" placeholder="항목" style="flex:1;min-width:100px">
+      <input id="budgetAmount" placeholder="금액" type="number" style="width:100px;flex:none">
+      <select id="budgetWho" style="width:90px;flex:none"><option value="">결제자</option>${memberOpts}</select>
+      <button class="btn-primary" id="btnAddBudget" style="padding:10px 16px;font-size:13px">추가</button>
+    </div>
+  </div>`;
+}
+
+function renderNotesTab(t) {
+  return `<div class="card" style="padding:20px">
+    <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">📝 메모</h3>
+    <textarea id="tripNotes" placeholder="숙소 정보, 맛집 리스트, 주의사항 등..." style="min-height:200px;resize:vertical;line-height:1.8">${t.notes||''}</textarea>
+  </div>`;
+}
+
+function bindDetail() {
+  const t = state.trips.find(x => x.id === state.selectedTrip);
+  if (!t) return;
+
+  $("#btnBack").onclick = () => { state.view = "home"; render(); };
+  $("#btnDeleteTrip").onclick = () => {
+    if (confirm("이 여행을 삭제할까요?")) {
+      state.trips = state.trips.filter(x => x.id !== t.id);
+      state.view = "home"; save(); render();
+    }
+  };
+
+  document.querySelectorAll("[data-tab]").forEach(el => {
+    el.onclick = () => { state.activeTab = el.dataset.tab; render(); };
+  });
+
+  // Schedule
+  if (state.activeTab === "schedule") {
+    const btn = $("#btnAddSched");
+    if (btn) btn.onclick = () => {
+      const act = $("#schedAct").value.trim();
+      if (!act) return;
+      t.schedule.push({ id: genId(), time: $("#schedTime").value.trim(), activity: act, assignee: $("#schedWho").value });
+      save(); render();
+    };
+  }
+
+  // Checklist
+  if (state.activeTab === "checklist") {
+    document.querySelectorAll("[data-toggle]").forEach(el => {
+      el.onclick = () => {
+        const item = t.checklist.find(c => c.id === el.dataset.toggle);
+        if (item) { item.checked = !item.checked; save(); render(); }
+      };
+    });
+    document.querySelectorAll("[data-check]").forEach(el => {
+      el.onclick = () => {
+        const item = t.checklist.find(c => c.id === el.dataset.check);
+        if (item) { item.assignee = el.dataset.member; save(); render(); }
+      };
+    });
+    const input = $("#newCheckItem");
+    if (input) input.onkeydown = e => {
+      if (e.key === "Enter" && input.value.trim()) {
+        t.checklist.push({ id: genId(), text: input.value.trim(), checked: false, assignee: null });
+        save(); render();
+      }
+    };
+  }
+
+  // Photos
+  if (state.activeTab === "photos") {
+    const fileInput = $("#photoInput");
+    if (fileInput) fileInput.onchange = e => {
+      Array.from(e.target.files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = ev => {
+          t.photos.push({ id: genId(), src: ev.target.result, name: file.name, date: new Date().toLocaleDateString("ko-KR"), caption: "" });
+          save(); render();
+        };
+        reader.readAsDataURL(file);
+      });
+    };
+    document.querySelectorAll("[data-photo]").forEach(el => {
+      el.onclick = () => {
+        const photo = t.photos.find(p => p.id === el.dataset.photo);
+        if (photo) showLightbox(t, photo);
+      };
+    });
+  }
+
+  // Budget
+  if (state.activeTab === "budget") {
+    const btn = $("#btnAddBudget");
+    if (btn) btn.onclick = () => {
+      const label = $("#budgetLabel").value.trim();
+      const amount = Number($("#budgetAmount").value);
+      if (!label || !amount) return;
+      t.budget.push({ id: genId(), label, amount, paidBy: $("#budgetWho").value });
+      save(); render();
+    };
+  }
+
+  // Notes
+  if (state.activeTab === "notes") {
+    const textarea = $("#tripNotes");
+    if (textarea) {
+      let timeout;
+      textarea.oninput = () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => { t.notes = textarea.value; save(); }, 500);
+      };
+    }
+  }
+}
+
+// ═══════════ MODALS ═══════════
+function showModal(html) {
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `<div class="modal-content" id="modalInner">${html}</div>`;
+  overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+  document.body.appendChild(overlay);
+  return overlay;
+}
+
+function showAddTripModal() {
+  const overlay = showModal(`
+    <h3 style="font-size:20px;font-weight:800;margin-bottom:20px;text-align:center">✨ 새 여행 추가</h3>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <input id="mTripTitle" placeholder="여행 이름 (예: 제주도 가족여행)">
+      <input id="mTripDest" placeholder="목적지">
+      <div style="display:flex;gap:8px">
+        <div style="flex:1"><label style="font-size:12px;color:#888;margin-bottom:4px;display:block">출발일</label><input id="mTripStart" type="date"></div>
+        <div style="flex:1"><label style="font-size:12px;color:#888;margin-bottom:4px;display:block">도착일</label><input id="mTripEnd" type="date"></div>
+      </div>
+      <div>
+        <label style="font-size:13px;font-weight:600;margin-bottom:8px;display:block">여행 유형</label>
+        <div class="type-selector">
+          ${[["beach","🏖️","바다"],["mountain","⛰️","산"],["city","🏙️","도시"],["camping","🏕️","캠핑"],["theme","🎢","놀이공원"]].map(([k,icon,label]) =>
+            `<div class="type-btn" data-type="${k}"><div style="font-size:22px">${icon}</div><div style="font-size:11px;margin-top:2px">${label}</div></div>`
+          ).join('')}
+        </div>
+      </div>
+      <div>
+        <label style="font-size:13px;font-weight:600;margin-bottom:8px;display:block">이동수단</label>
+        <div style="display:flex;gap:8px">
+          ${[["plane","✈️ 비행기"],["car","🚗 자동차"],["train","🚂 기차"]].map(([k,l]) =>
+            `<div class="type-btn" data-transport="${k}" style="flex:1;padding:10px 8px">${l}</div>`
+          ).join('')}
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn-secondary" id="mTripCancel" style="flex:1">취소</button>
+        <button class="btn-primary" id="mTripOk" style="flex:1">추가하기</button>
+      </div>
+    </div>
+  `);
+
+  let selectedType = "beach", selectedTransport = "plane";
+  overlay.querySelectorAll("[data-type]").forEach(el => {
+    if (el.dataset.type === selectedType) el.classList.add("active");
+    el.onclick = () => {
+      overlay.querySelectorAll("[data-type]").forEach(x => x.classList.remove("active"));
+      el.classList.add("active");
+      selectedType = el.dataset.type;
+    };
+  });
+  overlay.querySelectorAll("[data-transport]").forEach(el => {
+    if (el.dataset.transport === selectedTransport) el.classList.add("active");
+    el.onclick = () => {
+      overlay.querySelectorAll("[data-transport]").forEach(x => x.classList.remove("active"));
+      el.classList.add("active");
+      selectedTransport = el.dataset.transport;
+    };
+  });
+
+  overlay.querySelector("#mTripCancel").onclick = () => overlay.remove();
+  overlay.querySelector("#mTripOk").onclick = () => {
+    const title = overlay.querySelector("#mTripTitle").value.trim();
+    if (!title) return;
+    const checklist = [...TEMPLATES.general, ...(TEMPLATES[selectedType]||[])].map((text,i) => ({ id:`c${i}`, text, checked:false, assignee:null }));
+    state.trips.push({
+      id: genId(), title,
+      destination: overlay.querySelector("#mTripDest").value.trim(),
+      startDate: overlay.querySelector("#mTripStart").value,
+      endDate: overlay.querySelector("#mTripEnd").value,
+      type: selectedType, transport: selectedTransport,
+      checklist, schedule:[], budget:[], photos:[], notes:""
+    });
+    save(); overlay.remove(); render();
+  };
+}
+
+function showAddMemberModal() {
+  let selectedEmoji = "👤";
+  const overlay = showModal(`
+    <h3 style="font-size:20px;font-weight:800;margin-bottom:20px;text-align:center">👤 가족 추가</h3>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <input id="mMemName" placeholder="이름">
+      <div>
+        <label style="font-size:13px;font-weight:600;margin-bottom:8px;display:block">이모지 선택</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          ${EMOJIS.map(e => `<span class="emoji-pick" data-emoji="${e}" style="font-size:28px;cursor:pointer;padding:6px;border-radius:12px;border:2px solid transparent">${e}</span>`).join('')}
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn-secondary" id="mMemCancel" style="flex:1">취소</button>
+        <button class="btn-primary" id="mMemOk" style="flex:1">추가하기</button>
+      </div>
+    </div>
+  `);
+
+  overlay.querySelectorAll(".emoji-pick").forEach(el => {
+    el.onclick = () => {
+      overlay.querySelectorAll(".emoji-pick").forEach(x => { x.style.background="transparent"; x.style.borderColor="transparent"; });
+      el.style.background="#4ECDC422"; el.style.borderColor="#4ECDC4";
+      selectedEmoji = el.dataset.emoji;
+    };
+  });
+  overlay.querySelector("#mMemCancel").onclick = () => overlay.remove();
+  overlay.querySelector("#mMemOk").onclick = () => {
+    const name = overlay.querySelector("#mMemName").value.trim();
+    if (!name) return;
+    state.members.push({ id: genId(), name, emoji: selectedEmoji, color: COLORS[state.members.length % COLORS.length] });
+    save(); overlay.remove(); render();
+  };
+}
+
+function showRoomInfoModal() {
+  const overlay = showModal(`
+    <div style="text-align:center">
+      <div style="font-size:40px;margin-bottom:12px">🏠</div>
+      <h3 style="font-size:18px;font-weight:800;margin-bottom:8px">가족 공유 코드</h3>
+      <p style="font-size:13px;color:#888;margin-bottom:20px">이 코드를 가족에게 공유하면<br>같은 공간에서 함께 계획할 수 있어요</p>
+      <div style="background:#F8F9FA;border-radius:16px;padding:20px 24px;margin-bottom:16px">
+        <div class="room-code-display">${state.roomCode}</div>
+      </div>
+      <button class="btn-primary" id="mCopyCode" style="width:100%;margin-bottom:8px">📋 코드 복사하기</button>
+      <div style="background:#FFF8E1;border-radius:14px;padding:14px;margin-top:12px;text-align:left">
+        <p style="font-size:12px;color:#F59E0B;font-weight:600;margin-bottom:6px">📌 사용 방법</p>
+        <p style="font-size:12px;color:#92400E;line-height:1.7">
+          1️⃣ 이 HTML 파일을 가족에게 공유<br>
+          2️⃣ 가족이 파일을 열고 위 코드로 참여<br>
+          3️⃣ 같은 기기에서는 데이터가 자동 공유<br>
+          ⚠️ 다른 기기에서는 각각 데이터가 저장돼요
+        </p>
+      </div>
+      <button class="btn-secondary" id="mCloseRoom" style="width:100%;margin-top:12px">닫기</button>
+    </div>
+  `);
+  overlay.querySelector("#mCopyCode").onclick = () => {
+    navigator.clipboard?.writeText(state.roomCode).then(() => {
+      overlay.querySelector("#mCopyCode").textContent = "✅ 복사됨!";
+      overlay.querySelector("#mCopyCode").classList.add("green");
+    });
+  };
+  overlay.querySelector("#mCloseRoom").onclick = () => overlay.remove();
+}
+
+function showLightbox(trip, photo) {
+  const overlay = showModal(`
+    <div style="margin:-28px -28px 0;position:relative">
+      <img src="${photo.src}" alt="" style="width:100%;max-height:60vh;object-fit:contain;background:#f5f5f5;display:block">
+      <button id="lbClose" style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.5);color:white;border:none;border-radius:50%;width:36px;height:36px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+    <div style="padding-top:16px">
+      <input id="lbCaption" placeholder="캡션을 입력하세요..." value="${photo.caption||''}" style="margin-bottom:10px;font-size:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:12px;color:#999">📅 ${photo.date}</span>
+        <button id="lbDelete" style="background:#FFF0F0;color:#FF6B6B;border:none;border-radius:12px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer">🗑️ 삭제</button>
+      </div>
+    </div>
+  `);
+
+  overlay.querySelector("#lbClose").onclick = () => overlay.remove();
+  overlay.querySelector("#lbCaption").oninput = e => { photo.caption = e.target.value; save(); };
+  overlay.querySelector("#lbDelete").onclick = () => {
+    trip.photos = trip.photos.filter(p => p.id !== photo.id);
+    save(); overlay.remove(); render();
+  };
+}
+
+// ─── Init ───
+render();
+</script>
+</body>
+</html>
